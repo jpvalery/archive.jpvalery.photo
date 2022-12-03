@@ -4,7 +4,7 @@ import {
   ArrowUturnLeftIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  XMarkIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import Image from 'next/image'
@@ -63,25 +63,27 @@ export default function SharedModal({
                 exit="exit"
                 className="absolute"
               >
+                <div className="h-screen w-screen">
                 <Image
                   src={`https://res.cloudinary.com/${
                     process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
                   }/image/upload/c_scale,${navigation ? 'w_1280' : 'w_1920'}/${
                     currentImage.public_id
                   }.${currentImage.format}`}
-                  width={navigation ? 1280 : 1920}
-                  height={navigation ? 853 : 1280}
                   priority
+                  fill={true}
                   alt="Next.js Conf image"
                   onLoadingComplete={() => setLoaded(true)}
+                  className="object-contain pb-24"
                 />
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
 
         {/* Buttons + bottom nav bar */}
-        <div className="absolute inset-0 mx-auto flex max-w-7xl items-center justify-center">
+        <div className="absolute inset-0 mx-auto flex max-w-6xl items-center justify-center">
           {/* Buttons */}
           {loaded && (
             <div className="relative aspect-[3/2] max-h-full w-full">
