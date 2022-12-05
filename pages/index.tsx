@@ -88,15 +88,38 @@ const Home: NextPage = ({ images }: { images: ImageProps[] }) => {
 export default Home
 
 export async function getStaticProps() {
-  const results = await cloudinary.v2.search
+
+  let next_cursor = null;
+  let results = [];
+
+  for (let i = 0; i < 3; i++) {
+
+    const res = await cloudinary.v2.search
     .expression(`folder:${process.env.CLOUDINARY_FOLDER}/*`)
     .sort_by('public_id', 'desc')
-    .max_results(400)
+    .max_results(500)
+    .next_cursor(next_cursor)
     .execute()
+
+    if (res.next_cursor) {
+        console.log("More photos to fetch")
+        results = results.concat(res.resources)
+        next_cursor = res.next_cursor
+        }
+    else if (res.next_cursor == undefined) {
+        console.log("Last batch of photos to fetch")
+        results = results.concat(res.resources)
+        next_cursor = res.next_cursor
+        }
+    else {
+        console.log("Done");
+        } 
+  }
+
   let reducedResults: ImageProps[] = []
 
   let i = 0
-  for (let result of results.resources) {
+  for (let result of results) {
     reducedResults.push({
       id: i,
       height: result.height,
@@ -107,7 +130,7 @@ export async function getStaticProps() {
     i++
   }
 
-  const blurImagePromises = results.resources.map((image: ImageProps) => {
+  const blurImagePromises = results.map((image: ImageProps) => {
     return getBase64ImageUrl(image)
   })
   const imagesWithBlurDataUrls = await Promise.all(blurImagePromises)
